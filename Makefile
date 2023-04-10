@@ -128,7 +128,7 @@ $(BOTTLES): | $(BOTTLES_DIR)
 
 $(BOTTLES_DIR):
 	echo -e "\033[92mUpdating:\033[39m macOS Homebrew"
-	if [[ $$(stat -f %u /usr/local/var/homebrew) -ne "$${UID}" ]]; then \
+	if [[ $$(stat -f %u /opt/homebrew/var/homebrew) -ne "$${UID}" ]]; then \
 		echo "Missing permissions to update Homebrew formulae!" >&2; \
 	else \
 		brew update >/dev/null; \
@@ -205,6 +205,8 @@ ifeq ($(detected_OS),Darwin)
 	STATUSQ_CMAKE_CONFIG_PARAMS += -DCMAKE_OSX_ARCHITECTURES=x86_64
 	QRCODEGEN_MAKE_PARAMS += CFLAGS="-target x86_64-apple-macos10.12"
 	NIM_PARAMS += --cpu:amd64 --os:MacOSX --passL:"-arch x86_64" --passC:"-arch x86_64"
+    else
+	STATUSGO_MAKE_PARAMS += FORCE_ARCH="arm64" BUILD_TAGS="gowaku_skip_migrations,nimbus_light_client"
   endif
  endif
 endif
@@ -334,10 +336,14 @@ STATUSGO := vendor/status-go/build/bin/libstatus.$(LIBSTATUS_EXT)
 STATUSGO_LIBDIR := $(shell pwd)/$(shell dirname "$(STATUSGO)")
 export STATUSGO_LIBDIR
 
+NIMBUS_ETH1_PATH ?= $(CURDIR)/../nimbus-eth1
+export VERIF_PROXY_OUT_PATH ?= $(NIMBUS_ETH1_PATH)/build/libverifproxy
+status-go: $(STATUSGO)
+
 $(STATUSGO): | deps
 	echo -e $(BUILD_MSG) "status-go"
 	+ cd vendor/status-go && \
-	  $(MAKE) statusgo-shared-library $(STATUSGO_MAKE_PARAMS) $(HANDLE_OUTPUT)
+	  $(MAKE) statusgo-shared-library $(STATUSGO_MAKE_PARAMS)
 
 status-go: $(STATUSGO)
 
