@@ -199,6 +199,7 @@ endif
 ifeq ($(detected_OS),Darwin)
  ifeq ("$(shell sysctl -nq hw.optional.arm64)","1")
    ifneq ($(QT_ARCH),arm64)
+
 	STATUSGO_MAKE_PARAMS += GOBIN_SHARED_LIB_CFLAGS="CGO_ENABLED=1 GOOS=darwin GOARCH=amd64"
 	STATUSKEYCARDGO_MAKE_PARAMS += CGOFLAGS="CGO_ENABLED=1 GOOS=darwin GOARCH=amd64"
 	DOTHERSIDE_CMAKE_PARAMS += -DCMAKE_OSX_ARCHITECTURES=x86_64
@@ -338,7 +339,6 @@ export STATUSGO_LIBDIR
 
 NIMBUS_ETH1_PATH ?= $(CURDIR)/../nimbus-eth1
 export VERIF_PROXY_OUT_PATH ?= $(NIMBUS_ETH1_PATH)/build/libverifproxy
-status-go: $(STATUSGO)
 
 $(STATUSGO): | deps
 	echo -e $(BUILD_MSG) "status-go"
